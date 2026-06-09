@@ -1,0 +1,16 @@
+# Frontend build & dependencies
+node_modules/
+dist/
+.env
+.env.local
+.env.production
+.DS_Store
+
+# Backend environment & files
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+venv/
+.env
