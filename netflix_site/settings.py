@@ -1,17 +1,14 @@
 from pathlib import Path
 import os
 from datetime import timedelta
-import dj_database_url  # Add this import at the top
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Pull critical security keys directly from the environment variables
 SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-insecure-key-for-local-dev-only')
 
-# Explicitly default to False if the env variable isn't string-matched to True
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Allow local testing configurations + your upcoming production URLs
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 INSTALLED_APPS = [
@@ -31,7 +28,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # CRITICAL: Serves static admin files safely on Render
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -44,8 +41,26 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'netflix_site.urls'
 
 # ════════════════════════════════════════════
-# DATABASE UPGRADE: SQLITE FALLBACK ➔ SUPABASE POSTGRES
+# THE MISSING PIECES YOU DELETED
 # ════════════════════════════════════════════
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'netflix_site.wsgi.application'
+
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -53,9 +68,20 @@ DATABASES = {
     )
 }
 
-# Keep your template, auth password validators, and internationalization intact here...
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
 
-# Static File Optimization for WhiteNoise Production
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_TZ = True
+
+# ════════════════════════════════════════════
+
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -81,12 +107,8 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# ════════════════════════════════════════════
-# DYNAMIC CORS ORIGIN ENFORCEMENT
-# ════════════════════════════════════════════
 CORS_ALLOW_ALL_ORIGINS = False 
 
-# Parse production domains dynamically via environment variables
 raw_cors_origins = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173')
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in raw_cors_origins.split(',')]
 
